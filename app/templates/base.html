@@ -1,0 +1,59 @@
+{% load static %}
+<!doctype html>
+<html lang="en" class="h-100">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{% block description %}Django Boilerplate{% endblock %}">
+
+    <title>{% block title %}Django Boilerplate{% endblock %}</title>
+
+    <!-- Local styles -->
+    <link href="{% static 'css/core.css' %}" rel="stylesheet">
+
+    <!-- Bootstrap v5.2.3 CSS -->
+    <link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet">
+
+    <!-- Bootstrap v5.2.3 JS -->
+    <script src="{% static "js/bootstrap.bundle.min.js" %}"></script>
+
+    <!-- Bootstrap Icons v1.10.3 -->
+    <link rel="stylesheet" href="{% static "bootstrap-icons/bootstrap-icons.css" %}">
+  </head>
+
+  <body class="d-flex flex-column h-100">
+    {% include "navbar.html" %}
+
+    <main class="flex-shrink-0 my-4">
+      {% include "messages.html" %}
+
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer mt-auto py-3 border-top text-bg-dark">
+      <div class="container">
+        {% block footer %}
+          <span class="float-start">
+            {% block footer_left %}Copyright &copy; 2023 Andrew Northall{% endblock %}
+          </span>
+
+          <span class="float-end">
+            {% block footer_right %}{% endblock %}
+          </span>
+        {% endblock %}
+      </div>
+    </footer>
+
+    <!-- jQuery v3.6.4 JS -->
+    <script src="{% static "js/jquery-3.6.4.min.js" %}"></script>
+
+    <!-- Clickable elements with data-href -->
+    <script>
+      jQuery(document).ready(function($) {
+        $('*[data-href]').on('click', function() {
+          window.location = $(this).data("href");
+        });
+      });
+    </script>
+  </body>
+</html>

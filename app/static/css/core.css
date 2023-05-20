@@ -1,0 +1,18 @@
+/* Main layout options */
+body {
+  overflow-y:scroll;
+}
+
+.alert {
+  text-align: center
+}
+
+/* Hide crispy forms asterisk */
+.asteriskField {
+  display: none !important;
+}
+
+/* Clickable JS elements */
+[data-href], [data-bs-toggle], [hx-get] {
+  cursor: pointer;
+}

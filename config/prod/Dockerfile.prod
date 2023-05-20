@@ -1,0 +1,51 @@
+# syntax=docker/dockerfile:1
+
+################
+### Builder ####
+################
+FROM python:3.11.3-alpine as builder
+
+# Set working directory
+WORKDIR /usr/src/app
+
+# Environment setup
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Install psycopg2 dependencies
+RUN apk update \
+    && apk add postgresql-dev gcc python3-dev musl-dev
+
+# Python packages
+RUN pip install --upgrade pip
+COPY ./requirements.txt .
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
+
+##################
+### Production ###
+##################
+FROM python:3.11.3-alpine
+
+# Install psycopg2 depencencies
+RUN apk update && apk add libpq
+
+# Copy wheels
+COPY --from=builder /usr/src/app/wheels /opt/app/wheels
+RUN pip install --no-cache /opt/app/wheels/*
+
+# Create directories
+RUN mkdir -p /opt/app /opt/app/staticfiles /opt/app/mediafiles
+
+# Copy entrypoint
+COPY ./config/prod/entrypoint.prod.sh /opt/app
+RUN chmod +x /opt/app/entrypoint.prod.sh
+
+# Set up user
+RUN addgroup --g 1001 app
+RUN adduser -u 1001 -G app -h /opt/app -D app
+RUN chown app:app -R /opt/app
+USER app
+WORKDIR /opt/app/src
+
+# Run entrypoint.sh.
+ENTRYPOINT ["/opt/app/entrypoint.prod.sh"]

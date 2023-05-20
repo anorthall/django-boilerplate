@@ -1,0 +1,39 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" href="#">Django</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" href="#">Home</a>
+        </li>
+
+        {% if request.user.is_authenticated %}
+          {% if request.user.is_staff %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+            </li>
+          {% endif %}
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'core:password_change' %}">Account</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'core:logout' %}">Logout</a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'core:login' %}">Login</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'core:register' %}">Register</a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
