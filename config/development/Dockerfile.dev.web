@@ -1,13 +1,13 @@
 # syntax=docker/dockerfile:1
-FROM python:3.11.3-alpine
+FROM python:3.11-alpine
 
 # Environment setup
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Set working directory
-RUN mkdir -p /opt/dev
-WORKDIR /opt/dev
+RUN mkdir -p /opt/app
+WORKDIR /opt/app
 
 # System packages
 RUN apk update \
@@ -19,14 +19,14 @@ COPY ./requirements.txt .
 RUN pip install -r requirements.txt
 
 # Copy entrypoint
-COPY ./config/dev/entrypoint.dev.sh .
-RUN chmod +x /opt/dev/entrypoint.dev.sh
+COPY ./config/development/entrypoint.dev.sh .
+RUN chmod +x /opt/app/entrypoint.dev.sh
 
 # Copy app
-COPY ./app/ /opt/dev/app/
+COPY ./app/ /opt/app/src/
 
 # Final environment
-WORKDIR /opt/dev/app
+WORKDIR /opt/app/src
 
 # Run entrypoint.sh.
-ENTRYPOINT ["/opt/dev/entrypoint.dev.sh"]
+ENTRYPOINT ["/opt/app/entrypoint.dev.sh"]

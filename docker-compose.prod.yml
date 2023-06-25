@@ -2,21 +2,21 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:15.2-alpine
+    image: postgres:15.3-alpine
     restart: always
     volumes:
-      - ./prod-data/db:/var/lib/postgresql/data
+      - ./data/production/db:/var/lib/postgresql/data
     env_file:
-      - ./config/prod/postgres.env
+      - ./config/production/postgres.env
 
   pgbackups:
     image: prodrigestivill/postgres-backup-local
     restart: always
     user: postgres:postgres
     volumes:
-      - ./prod-data/backups/db:/backups
+      - ./data/production/backups/db:/backups
     env_file:
-      - ./config/prod/postgres-backup.env
+      - ./config/production/postgres-backup.env
     depends_on:
       - db
 
@@ -25,15 +25,15 @@ services:
     user: 1001:1001
     build:
       context: .
-      dockerfile: ./config/prod/Dockerfile.prod
+      dockerfile: ./config/production/Dockerfile.prod.web
     command: gunicorn app.wsgi:application --bind 0.0.0.0:9090
     volumes:
-      - ./prod-data/staticfiles:/opt/app/staticfiles
-      - ./prod-data/mediafiles:/opt/app/mediafiles
+      - ./data/production/staticfiles:/opt/app/staticfiles
+      - ./data/production/mediafiles:/opt/app/mediafiles
       - ./app:/opt/app/src
     ports:
       - 9090:9090
     env_file:
-      - ./config/prod/prod.env
+      - ./config/production/production.env
     depends_on:
       - db

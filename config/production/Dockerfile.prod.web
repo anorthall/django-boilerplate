@@ -3,7 +3,7 @@
 ################
 ### Builder ####
 ################
-FROM python:3.11.3-alpine as builder
+FROM python:3.11-alpine as builder
 
 # Set working directory
 WORKDIR /usr/src/app
@@ -24,7 +24,7 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requir
 ##################
 ### Production ###
 ##################
-FROM python:3.11.3-alpine
+FROM python:3.11-alpine
 
 # Install psycopg2 depencencies
 RUN apk update && apk add libpq
@@ -37,7 +37,7 @@ RUN pip install --no-cache /opt/app/wheels/*
 RUN mkdir -p /opt/app /opt/app/staticfiles /opt/app/mediafiles
 
 # Copy entrypoint
-COPY ./config/prod/entrypoint.prod.sh /opt/app
+COPY ./config/production/entrypoint.prod.sh /opt/app
 RUN chmod +x /opt/app/entrypoint.prod.sh
 
 # Set up user
