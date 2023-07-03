@@ -34,10 +34,15 @@ COPY --from=builder /usr/src/app/wheels /opt/app/wheels
 RUN pip install --no-cache /opt/app/wheels/*
 
 # Create directories
-RUN mkdir -p /opt/app /opt/app/staticfiles /opt/app/mediafiles
+RUN mkdir -p /opt/app /opt/app/staticfiles /opt/app/mediafiles /opt/app/config
+RUN mkdir -p /opt/app/logs /opt/app/logs/django
+
+# Set python path for config directory
+RUN touch /opt/app/config/__init__.py
+ENV PYTHONPATH "/opt/app"
 
 # Copy entrypoint
-COPY ./config/production/entrypoint.prod.sh /opt/app
+COPY ./config/docker/production/entrypoint.prod.sh /opt/app
 RUN chmod +x /opt/app/entrypoint.prod.sh
 
 # Set up user
@@ -45,6 +50,9 @@ RUN addgroup --g 1001 app
 RUN adduser -u 1001 -G app -h /opt/app -D app
 RUN chown app:app -R /opt/app
 USER app
+
+# Final environment
+ENV BASE_DIR /opt/app/src
 WORKDIR /opt/app/src
 
 # Run entrypoint.sh.

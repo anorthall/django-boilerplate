@@ -13,13 +13,16 @@ services:
   web-dev:
     build:
       context: .
-      dockerfile: ./config/development/Dockerfile.dev.web
+      dockerfile: ./config/docker/development/Dockerfile.dev.web
     command: python manage.py runserver 0.0.0.0:8000 --insecure
     volumes:
       - ./app/:/opt/app/src/
+      - ./config/django/:/opt/app/config/django/
+      - ./data/development/mediafiles:/opt/app/mediafiles
+      - ./data/development/staticfiles:/opt/app/staticfiles
     ports:
       - "8000:8000"
     env_file:
-      - ./config/development/development.env
+      - ./config/docker/development/development.env
     depends_on:
       - db-dev

@@ -6,8 +6,12 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # Set working directory
-RUN mkdir -p /opt/app
+RUN mkdir -p /opt/app /opt/app/config
 WORKDIR /opt/app
+
+# Set python path for config directory
+RUN touch /opt/app/config/__init__.py
+ENV PYTHONPATH "/opt/app"
 
 # System packages
 RUN apk update \
@@ -19,7 +23,7 @@ COPY ./requirements.txt .
 RUN pip install -r requirements.txt
 
 # Copy entrypoint
-COPY ./config/development/entrypoint.dev.sh .
+COPY ./config/docker/development/entrypoint.dev.sh .
 RUN chmod +x /opt/app/entrypoint.dev.sh
 
 # Copy app
@@ -27,6 +31,7 @@ COPY ./app/ /opt/app/src/
 
 # Final environment
 WORKDIR /opt/app/src
+ENV BASE_DIR /opt/app/src
 
 # Run entrypoint.sh.
 ENTRYPOINT ["/opt/app/entrypoint.dev.sh"]

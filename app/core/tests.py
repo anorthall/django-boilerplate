@@ -1,4 +1,4 @@
-from django.test import TestCase, Client
+from django.test import Client, TestCase
 from django.urls import reverse
 
 from .models import AppUser
@@ -31,16 +31,10 @@ class AuthenticationUnitTests(TestCase):
     def test_create_user_with_invalid_data(self):
         """Test creating a user with invalid data"""
         with self.assertRaises(ValueError):
-            AppUser.objects.create_user(
-                email="",
-                name=""
-            )
+            AppUser.objects.create_user(email="", name="")
 
         with self.assertRaises(ValueError):
-            AppUser.objects.create_user(
-                email="noname@user.app",
-                name=""
-            )
+            AppUser.objects.create_user(email="noname@user.app", name="")
 
     def test_create_superuser(self):
         """Test creating a superuser"""
