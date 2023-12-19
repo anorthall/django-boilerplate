@@ -1,0 +1,55 @@
+name: Tests
+
+on:
+  workflow_call:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  run-tests:
+    name: Django tests
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+      PYTHONPATH: ${{ github.workspace }}
+      BASE_DIR: ${{ github.workspace }}/web/django
+      ENV_KIND: development
+      SECRET_KEY: tests
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+          cache: 'pip'
+          cache-dependency-path: config/requirements/requirements.txt
+      - name: Upgrade pip
+        run: |
+          pip install --upgrade pip wheel setuptools
+      - name: Install dependencies
+        run: |
+          pip install -r config/requirements/requirements.txt
+      - name: Run Django tests
+        working-directory: ./web/django
+        run: |
+          pytest -c ${{ github.workspace }}/config/pytest.ini ${{ github.workspace }}/web/django
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5

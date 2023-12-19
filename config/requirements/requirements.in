@@ -1,0 +1,13 @@
+Django
+django-browser-reload
+django-crispy-forms
+django-debug-toolbar
+django-rich
+django-storages[s3]
+dj-database-url
+gunicorn
+Pillow
+psycopg2
+pytest-django
+sentry-sdk
+whitenoise

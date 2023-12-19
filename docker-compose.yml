@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    volumes:
+      - db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  web:
+    command: /app/run.sh devserver
+    build: .
+    volumes:
+      - ./web/django/:/app/src/
+      - ./config/django/:/app/config/django/
+      - ./web/static/:/app/static/
+      - mediafiles:/app/mediafiles/
+      - staticfiles:/app/staticfiles/
+    ports:
+      - "8000:8000"
+    env_file:
+      - config/env/dev.env
+    depends_on:
+      - db
+
+volumes:
+  db:
+  mediafiles:
+  staticfiles:
