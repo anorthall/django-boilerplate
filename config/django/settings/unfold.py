@@ -1,4 +1,4 @@
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy  # noqa: F401
 
 UNFOLD = {
     "SITE_SYMBOL": "monitoring",

@@ -6,7 +6,7 @@ import dj_database_url
 
 from django.core.exceptions import ImproperlyConfigured
 
-from .unfold import UNFOLD
+from .unfold import UNFOLD  # noqa: F401
 
 
 def env(name, default=None, force_type: Any = str):
