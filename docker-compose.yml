@@ -1,5 +1,16 @@
 version: '3.8'
 
+x-base: &base
+  build: .
+  volumes:
+    - ./web/django/:/app/src/
+    - ./config/django/:/app/config/django/
+    - ./web/static/:/app/static/
+    - mediafiles:/app/mediafiles/
+    - staticfiles:/app/staticfiles/
+  env_file:
+    - config/env/dev.env
+
 services:
   db:
     image: postgres:latest
@@ -10,23 +21,30 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
 
-  web:
-    command: /app/run.sh devserver
-    build: .
+  redis:
+    image: redis:latest
     volumes:
-      - ./web/django/:/app/src/
-      - ./config/django/:/app/config/django/
-      - ./web/static/:/app/static/
-      - mediafiles:/app/mediafiles/
-      - staticfiles:/app/staticfiles/
+      - redis:/data
+    expose:
+      - 6379
+
+  tailwind:
+    <<: *base
+    command: /app/run.sh manage tailwind start
+    tty: true
+
+  web:
+    <<: *base
+    command: /app/run.sh devserver
     ports:
       - "8000:8000"
-    env_file:
-      - config/env/dev.env
     depends_on:
       - db
+      - redis
+
 
 volumes:
   db:
   mediafiles:
   staticfiles:
+  redis:

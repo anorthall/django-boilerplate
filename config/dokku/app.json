@@ -1,0 +1,22 @@
+{
+  "name": "Django",
+  "description": "Django app",
+  "keywords": ["django"],
+  "repository": "",
+  "healthchecks": {
+    "web": [
+        {
+            "type":        "startup",
+            "name":        "web check",
+            "description": "Checking if the app responds to /healthcheck/",
+            "path":        "/healthcheck",
+            "attempts": 20
+        }
+    ]
+  },
+  "addons": [
+    "dokku-postgres"
+  ],
+  "cron": [
+  ]
+}

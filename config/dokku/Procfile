@@ -1,0 +1,2 @@
+web: /app/run.sh start
+worker: /app/run.sh worker

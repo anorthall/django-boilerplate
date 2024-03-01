@@ -6,20 +6,24 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV TINI_SUBREAPER 1
 ENV BASE_DIR "/app/src/"
-ENV PYTHONPATH "/app/:/app/src/"
+ENV PYTHONPATH "${PYTHONPATH}:/app/:/app/src/"
+ENV PATH "${PATH}:/app/.local/bin"
 
 # Create directories and initial environment
 RUN mkdir -p /app /app/logs /app/src /app/config \
              /app/staticfiles /app/mediafiles
 WORKDIR /app/
 
+# Node apt sources for Tailwind
+ARG NODE_MAJOR=18
+RUN mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpq-dev \
-    postgresql-client \
-    netcat-traditional \
-    tini
+    build-essential libpq-dev postgresql-client netcat-traditional \
+    ca-certificates curl gnupg nodejs tini
 
 # Python packages
 RUN pip install --upgrade pip
@@ -33,7 +37,7 @@ RUN chmod +x /app/run.sh
 # Copy app
 COPY web/django /app/src
 COPY web/static /app/static
-COPY config/django /app/src/config
+COPY config/django /app/config/django
 COPY config/pytest.ini /app
 
 # Final environment

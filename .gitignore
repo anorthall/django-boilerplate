@@ -133,9 +133,13 @@ dmypy.json
 
 # Settings and production scripts
 config/env/*.env
+*.dump
 
 # Tailwind CSS
 web/static/css/core.css
 
 # Node
 node_modules/
+
+# Ruff
+.ruff_cache/

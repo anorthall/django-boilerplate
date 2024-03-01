@@ -3,7 +3,10 @@ from pathlib import Path
 from typing import Any
 
 import dj_database_url
+
 from django.core.exceptions import ImproperlyConfigured
+
+from .unfold import UNFOLD
 
 
 def env(name, default=None, force_type: Any = str):
@@ -13,10 +16,10 @@ def env(name, default=None, force_type: Any = str):
 
     try:
         return force_type(setting)
-    except ValueError:
+    except ValueError as err:
         raise ImproperlyConfigured(
-            f"{name} environment variable is not a valid {force_type.__name__}"
-        )
+            f"{name} environment variable is not a valid {force_type.__name__}",
+        ) from err
 
 
 # BASE_DIR should point to where manage.py is
@@ -33,6 +36,9 @@ TIME_FORMAT = "H:i"
 # Site root URL with protocol and without a trailing slash
 SITE_ROOT = env("SITE_ROOT", "http://127.0.0.1:8000")
 
+# Django admin title
+ADMIN_TITLE = env("ADMIN_TITLE", "Django Admin")
+
 # Security keys/options
 SECRET_KEY = env("SECRET_KEY")
 ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS", "http://127.0.0.1").split(" ")
@@ -48,16 +54,33 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Authentication
-LOGIN_URL = "core:login"
+LOGIN_URL = "admin:index"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 AUTH_USER_MODEL = "core.User"
+
+# Cache
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": env("REDIS_URL"),
+    },
+}
 
 # Django apps
 INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
     "core.apps.CoreConfig",
+    "tailwind",
+    "tailwindcss",
+    "django_htmx",
     "crispy_forms",
+    "crispy_tailwind",
+    "dal",
+    "dal_select2",
+    "unfold",
+    "unfold.contrib.filters",
+    "unfold.contrib.forms",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -78,6 +101,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_currentuser.middleware.ThreadLocalUserMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
 ]
 
 # Django templates
@@ -110,7 +135,7 @@ DATABASES = {
         default="postgres://postgres:postgres@db:5432/postgres",
         conn_max_age=env("CONN_MAX_AGE", 30, int),
         conn_health_checks=True,
-    )
+    ),
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 DATABASES["default"]["ENGINE"] = "django.db.backends.postgresql"
@@ -118,7 +143,7 @@ DATABASES["default"]["ENGINE"] = "django.db.backends.postgresql"
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",  # noqa: E501
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
@@ -164,7 +189,7 @@ else:
         "default": {
             "BACKEND": "django.core.files.storage.FileSystemStorage",
             "OPTIONS": {
-                "location": MEDIA_STORAGE_LOCATION,
+                "location": MEDIA_ROOT,
             },
         },
     }
@@ -172,3 +197,17 @@ else:
 STORAGES["staticfiles"] = {
     "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
 }
+
+# Upload path for generic logos
+LOGO_UPLOAD_PATH = "logos/"
+ICON_UPLOAD_PATH = "icons/"
+
+# django-crispy-forms
+CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
+CRISPY_TEMPLATE_PACK = "tailwind"
+
+# django-tailwind
+TAILWIND_APP_NAME = "tailwindcss"
+
+# celery
+CELERY_BROKER_URL = env("RABBITMQ_URL", "amqp://rabbitmq:5672")

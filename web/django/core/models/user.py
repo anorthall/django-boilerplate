@@ -1,5 +1,3 @@
-from typing import Optional
-
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
@@ -8,13 +6,7 @@ from django.contrib.auth.models import (
 from django.db import models
 from django.db.models.functions import Lower
 
-
-class TimestampMixin(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        abstract = True
+from .generics import TimestampMixin
 
 
 class UserManager(BaseUserManager):
@@ -22,7 +14,7 @@ class UserManager(BaseUserManager):
     def create_user(
         email: str,
         name: str,
-        password: Optional[str] = None,
+        password: str | None = None,
     ) -> "User":
         if not email:
             raise ValueError("Users must have an email address")
@@ -61,12 +53,12 @@ class User(TimestampMixin, PermissionsMixin, AbstractBaseUser):
     is_active = models.BooleanField("enabled user", db_default=False)
 
     class Meta:
-        constraints = [
+        constraints = (
             models.UniqueConstraint(
                 Lower("email"),
                 name="user_email_unique",
             ),
-        ]
+        )
 
     def __str__(self) -> str:
         return self.name

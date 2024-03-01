@@ -8,7 +8,7 @@ class TestUser(TestCase):
         self.user = User.objects.create_user(
             email="test@test.com",
             name="Test User",
-            password="test",
+            password="test",  # noqa S106
         )
 
     def test_name(self):

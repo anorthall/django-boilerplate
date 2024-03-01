@@ -1,17 +1,23 @@
+import socket
+
 from .base import *
 
 DEBUG = False
 
 # Security
-SECURE_HSTS_SECONDS = env("SECURE_HSTS_SECONDS", 0, int)
-SECURE_SSL_REDIRECT = env("SECURE_SSL_REDIRECT", False, int)
-SECURE_HSTS_INCLUDE_SUBDOMAINS = env("SECURE_HSTS_INCLUDE_SUBDOMAINS", False, int)
-SECURE_HSTS_PRELOAD = env("SECURE_HSTS_PRELOAD", False, int)
-SESSION_COOKIE_SECURE = env("SESSION_COOKIE_SECURE", False, int)
-CSRF_COOKIE_SECURE = env("CSRF_COOKIE_SECURE", False, int)
+SECURE_HSTS_SECONDS = env("SECURE_HSTS_SECONDS", 0, force_type=int)
+SECURE_SSL_REDIRECT = env("SECURE_SSL_REDIRECT", default=False, force_type=int)
+SECURE_HSTS_PRELOAD = env("SECURE_HSTS_PRELOAD", default=False, force_type=int)
+SESSION_COOKIE_SECURE = env("SESSION_COOKIE_SECURE", default=False, force_type=int)
+CSRF_COOKIE_SECURE = env("CSRF_COOKIE_SECURE", default=False, force_type=int)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = env(
+    "SECURE_HSTS_INCLUDE_SUBDOMAINS",
+    default=False,
+    force_type=int,
+)
 
 # Only enable if required
-if env("SECURE_PROXY_SSL_HEADER", False, int):
+if env("SECURE_PROXY_SSL_HEADER", default=False, force_type=int):
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Sentry integration

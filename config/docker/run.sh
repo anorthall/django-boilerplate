@@ -40,10 +40,25 @@ then
     python src/manage.py runserver 0.0.0.0:"${PORT:=8000}" --insecure
 fi
 
-if [ "$1" = "start" ]
+if [ "$1" = "worker" ]
 then
     echo "Collecting static files..."
-    python src/manage.py collectstatic --noinput
+    python src/manage.py collectstatic --no-input
+
+    echo "Starting worker..."
+    celery -A config.django.celery worker -l info
+fi
+
+if [ "$1" = "start" ]
+then
+    echo "Installing TailwindCSS..."
+    python src/manage.py tailwind install --no-input
+
+    echo "Building TailwindCSS..."
+    python src/manage.py tailwind build --no-input
+
+    echo "Collecting static files..."
+    python src/manage.py collectstatic --no-input
 
     if [ "$RUN_MIGRATIONS_ON_START" = "yes" ]
     then
@@ -57,5 +72,6 @@ then
     echo "Detected $CPU_CORES CPU cores. Defaulting to $WORKERS gunicorn workers."
 
     echo "Starting server..."
-    gunicorn config.django.wsgi:application --bind 0.0.0.0:"${PORT:=8000}" --workers "$WORKERS"
+    granian --interface wsgi --host 0.0.0.0 --port "${PORT:=8000}" --workers "$WORKERS" \
+            --respawn-failed-workers --no-reload --no-ws config.django.wsgi:application
 fi
